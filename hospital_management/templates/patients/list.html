@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Patients List | CarePulse{% endblock %}
+{% block nav_patients %}active{% endblock %}
+
+{% block page_title %}Patient Management{% endblock %}
+{% block page_subtitle %}List and manage registered hospital patients.{% endblock %}
+
+{% block content %}
+<div class="glass-card">
+    <div class="section-header">
+        <h2>Registered Patients</h2>
+        <a href="{% url 'patient_create' %}" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Add Patient
+        </a>
+    </div>
+
+    <div class="table-container">
+        {% if patients %}
+        <table class="premium-table">
+            <thead>
+                <tr>
+                    <th>Patient Name</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr>
+                    <td>
+                        <strong style="color: var(--text-primary);">{{ patient.name }}</strong>
+                    </td>
+                    <td>{{ patient.age }} yrs</td>
+                    <td>
+                        <span class="badge badge-info">{{ patient.gender }}</span>
+                    </td>
+                    <td>{{ patient.phone }}</td>
+                    <td style="color: var(--text-secondary); max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        {{ patient.address }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fa-solid fa-user-injured" style="opacity: 0.2;"></i>
+            </div>
+            <h3>No Patients Found</h3>
+            <p>Get started by registering a new patient record in the clinic database.</p>
+            <a href="{% url 'patient_create' %}" class="btn btn-primary" style="margin-top: 1.5rem;">
+                <i class="fa-solid fa-plus"></i> Add First Patient
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CarePulse - Hospital Management System{% endblock %}</title>
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-heart-pulse brand-icon"></i>
+                <span class="brand-name">CarePulse</span>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item {% block nav_dashboard %}{% endblock %}">
+                    <a href="{% url 'dashboard' %}">
+                        <i class="fa-solid fa-chart-pie nav-icon"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item {% block nav_patients %}{% endblock %}">
+                    <a href="{% url 'patient_list' %}">
+                        <i class="fa-solid fa-user-injured nav-icon"></i>
+                        <span>Patients</span>
+                    </a>
+                </li>
+                <li class="nav-item {% block nav_doctors %}{% endblock %}">
+                    <a href="{% url 'doctor_list' %}">
+                        <i class="fa-solid fa-user-md nav-icon"></i>
+                        <span>Doctors</span>
+                    </a>
+                </li>
+                <li class="nav-item {% block nav_appointments %}{% endblock %}">
+                    <a href="{% url 'appointment_list' %}">
+                        <i class="fa-solid fa-calendar-check nav-icon"></i>
+                        <span>Appointments</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <div class="user-avatar">AD</div>
+                <div class="user-info">
+                    <span class="user-name">Admin Portal</span>
+                    <span class="user-role">Administrator</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="page-title">
+                    <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+                    <p>{% block page_subtitle %}Welcome back to CarePulse panel.{% endblock %}</p>
+                </div>
+                <div class="header-actions">
+                    <a href="{% url 'appointment_create' %}" class="btn btn-primary">
+                        <i class="fa-solid fa-plus"></i> Book Appointment
+                    </a>
+                </div>
+            </header>
+
+            <!-- Main Content Insertion -->
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

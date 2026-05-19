@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Appointments | CarePulse{% endblock %}
+{% block nav_appointments %}active{% endblock %}
+
+{% block page_title %}Appointment Schedules{% endblock %}
+{% block page_subtitle %}Manage scheduled diagnostic and treatment checkups.{% endblock %}
+
+{% block content %}
+<div class="glass-card">
+    <div class="section-header">
+        <h2>Active Schedules</h2>
+        <a href="{% url 'appointment_create' %}" class="btn btn-primary">
+            <i class="fa-solid fa-calendar-plus"></i> Book Appointment
+        </a>
+    </div>
+
+    <div class="table-container">
+        {% if appointments %}
+        <table class="premium-table">
+            <thead>
+                <tr>
+                    <th>Patient Name</th>
+                    <th>Date & Scheduled Time</th>
+                    <th>Status Badge</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appt in appointments %}
+                <tr>
+                    <td>
+                        <strong style="color: var(--text-primary);">{{ appt.patient_name }}</strong>
+                    </td>
+                    <td>
+                        <i class="fa-regular fa-calendar-check" style="color: var(--accent-teal); margin-right: 0.5rem;"></i>
+                        {{ appt.appointment_date|date:"F d, Y - H:i" }}
+                    </td>
+                    <td>
+                        <span class="badge badge-teal">Scheduled</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fa-solid fa-calendar-days" style="opacity: 0.2;"></i>
+            </div>
+            <h3>No Scheduled Appointments</h3>
+            <p>Schedule checkup sessions for clinical consultations.</p>
+            <a href="{% url 'appointment_create' %}" class="btn btn-primary" style="margin-top: 1.5rem;">
+                <i class="fa-solid fa-calendar-plus"></i> Book First Appointment
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | CarePulse{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block page_title %}Clinical Dashboard{% endblock %}
+{% block page_subtitle %}Real-time clinical insights and metrics.{% endblock %}
+
+{% block content %}
+<!-- Metrics Grid -->
+<div class="metrics-grid">
+    <!-- Patients Metric -->
+    <div class="glass-card metric-card metric-patients">
+        <div class="metric-details">
+            <p>Total Patients</p>
+            <h3>{{ total_patients }}</h3>
+        </div>
+        <div class="metric-icon">
+            <i class="fa-solid fa-user-injured"></i>
+        </div>
+    </div>
+    
+    <!-- Doctors Metric -->
+    <div class="glass-card metric-card metric-doctors">
+        <div class="metric-details">
+            <p>Active Doctors</p>
+            <h3>{{ total_doctors }}</h3>
+        </div>
+        <div class="metric-icon">
+            <i class="fa-solid fa-user-md"></i>
+        </div>
+    </div>
+    
+    <!-- Appointments Metric -->
+    <div class="glass-card metric-card metric-appointments">
+        <div class="metric-details">
+            <p>Total Appointments</p>
+            <h3>{{ total_appointments }}</h3>
+        </div>
+        <div class="metric-icon">
+            <i class="fa-solid fa-calendar-check"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Detailed Layout -->
+<div class="dashboard-row">
+    <!-- Recent Appointments -->
+    <div class="glass-card">
+        <div class="section-header">
+            <h2>Upcoming Appointments</h2>
+            <a href="{% url 'appointment_list' %}" class="btn btn-secondary btn-sm" style="padding: 0.5rem 1rem; font-size: 0.8rem;">View All</a>
+        </div>
+        
+        <div class="table-container">
+            {% if recent_appointments %}
+            <table class="premium-table">
+                <thead>
+                    <tr>
+                        <th>Patient Name</th>
+                        <th>Schedule Date & Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in recent_appointments %}
+                    <tr>
+                        <td>
+                            <strong style="color: var(--text-primary);">{{ appt.patient_name }}</strong>
+                        </td>
+                        <td>
+                            <i class="fa-regular fa-clock" style="color: var(--accent-teal); margin-right: 0.5rem;"></i>
+                            {{ appt.appointment_date|date:"M d, Y - H:i" }}
+                        </td>
+                        <td>
+                            <span class="badge badge-teal">Scheduled</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fa-solid fa-calendar-times"></i>
+                </div>
+                <h3>No appointments booked</h3>
+                <p>Start scheduling patients with available doctors.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="glass-card" style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <div class="section-header">
+            <h2>Quick Actions</h2>
+        </div>
+        
+        <a href="{% url 'patient_create' %}" class="btn btn-secondary" style="justify-content: flex-start; padding: 1rem; width: 100%;">
+            <i class="fa-solid fa-user-plus" style="color: #38bdf8; font-size: 1.2rem; width: 25px;"></i>
+            <div style="text-align: left; margin-left: 0.5rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 600;">Register New Patient</h4>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">Add standard details for medical records.</p>
+            </div>
+        </a>
+        
+        <a href="{% url 'doctor_create' %}" class="btn btn-secondary" style="justify-content: flex-start; padding: 1rem; width: 100%;">
+            <i class="fa-solid fa-user-md" style="color: #34d399; font-size: 1.2rem; width: 25px;"></i>
+            <div style="text-align: left; margin-left: 0.5rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 600;">Add Medical Practitioner</h4>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">Register specialization and details.</p>
+            </div>
+        </a>
+        
+        <a href="{% url 'appointment_create' %}" class="btn btn-secondary" style="justify-content: flex-start; padding: 1rem; width: 100%;">
+            <i class="fa-solid fa-calendar-plus" style="color: #2dd4bf; font-size: 1.2rem; width: 25px;"></i>
+            <div style="text-align: left; margin-left: 0.5rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 600;">Book Patient Schedule</h4>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">Schedule date & times for checkups.</p>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}

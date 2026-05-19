@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Appointment | CarePulse{% endblock %}
+{% block nav_appointments %}active{% endblock %}
+
+{% block page_title %}Book Appointment{% endblock %}
+{% block page_subtitle %}Schedule a new consultation session.{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="section-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 2rem;">
+        <h2>Session Schedule Details</h2>
+    </div>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-grid">
+            <!-- Patient Name -->
+            <div class="form-group">
+                <label for="patient_name">Patient Name <span style="color: var(--accent-rose);">*</span></label>
+                <input type="text" id="patient_name" name="patient_name" class="form-control" placeholder="e.g., John Doe" required>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Enter the name of the patient scheduling the appointment.</p>
+            </div>
+            
+            <!-- Appointment Date & Time -->
+            <div class="form-group">
+                <label for="appointment_date">Appointment Date & Time <span style="color: var(--accent-rose);">*</span></label>
+                <input type="datetime-local" id="appointment_date" name="appointment_date" class="form-control" required>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Select the scheduled calendar date and clinical session hour.</p>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <a href="{% url 'appointment_list' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-calendar-check"></i> Book Appointment
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
