@@ -57,8 +57,9 @@
             <table class="premium-table">
                 <thead>
                     <tr>
-                        <th>Patient Name</th>
-                        <th>Schedule Date & Time</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Date & Time</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -66,14 +67,38 @@
                     {% for appt in recent_appointments %}
                     <tr>
                         <td>
-                            <strong style="color: var(--text-primary);">{{ appt.patient_name }}</strong>
+                            <strong style="color: var(--text-primary);">{{ appt.patient.name|default:"Unknown" }}</strong>
+                            {% if appt.priority_level == 'Emergency' %}
+                            <div style="font-size: 0.72rem; color: #fb7185; font-weight: 600; margin-top: 2px;">🚨 Emergency</div>
+                            {% elif appt.priority_level == 'Urgent' %}
+                            <div style="font-size: 0.72rem; color: #fbbf24; font-weight: 600; margin-top: 2px;">⚡ Urgent</div>
+                            {% endif %}
                         </td>
                         <td>
-                            <i class="fa-regular fa-clock" style="color: var(--accent-teal); margin-right: 0.5rem;"></i>
-                            {{ appt.appointment_date|date:"M d, Y - H:i" }}
+                            {% if appt.doctor %}
+                            <span style="color: var(--text-primary);">Dr. {{ appt.doctor.name }}</span>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 1px;">{{ appt.doctor.specialization }}</div>
+                            {% else %}
+                            <span style="color: var(--text-secondary);">Unassigned</span>
+                            {% endif %}
                         </td>
                         <td>
-                            <span class="badge badge-teal">Scheduled</span>
+                            <i class="fa-regular fa-clock" style="color: var(--accent-teal); margin-right: 0.4rem;"></i>
+                            {{ appt.appointment_date|date:"M d, Y" }}
+                            <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 1px;">{{ appt.appointment_date|date:"H:i" }}</div>
+                        </td>
+                        <td>
+                            {% if appt.status == 'Scheduled' %}
+                            <span class="badge" style="background-color: rgba(13,148,136,0.25); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.4);">🟦 Scheduled</span>
+                            {% elif appt.status == 'Completed' %}
+                            <span class="badge" style="background-color: rgba(37,99,235,0.25); color: #60a5fa; border: 1px solid rgba(96,165,250,0.4);">✅ Completed</span>
+                            {% elif appt.status == 'Cancelled' %}
+                            <span class="badge" style="background-color: rgba(225,29,72,0.25); color: #fb7185; border: 1px solid rgba(251,113,133,0.4);">❌ Cancelled</span>
+                            {% elif appt.status == 'No-Show' %}
+                            <span class="badge" style="background-color: rgba(147,51,234,0.25); color: #c084fc; border: 1px solid rgba(192,132,252,0.4);">🚫 No-Show</span>
+                            {% else %}
+                            <span class="badge" style="background-color: rgba(148,163,184,0.15); color: var(--text-secondary);">{{ appt.status }}</span>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}

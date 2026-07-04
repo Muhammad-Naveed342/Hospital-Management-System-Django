@@ -8,8 +8,8 @@ def dashboard(request):
     total_doctors = Doctor.objects.count()
     total_appointments = Appointment.objects.count()
     
-    # Get 5 upcoming or most recently added appointments
-    recent_appointments = Appointment.objects.all().order_by('-appointment_date')[:5]
+    # Get 4 most recent appointments for dashboard
+    recent_appointments = Appointment.objects.all().order_by('-appointment_date')[:4]
     
     context = {
         'total_patients': total_patients,

@@ -9,27 +9,85 @@
 {% block content %}
 <div class="glass-card" style="max-width: 800px; margin: 0 auto;">
     <div class="section-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 2rem;">
-        <h2>Session Schedule Details</h2>
+        <h2><i class="fa-solid fa-calendar-plus" style="color: var(--accent-teal); margin-right: 0.5rem;"></i> Session Schedule Details</h2>
     </div>
-    
-    <form method="POST">
+
+    <form method="POST" id="appointmentForm" novalidate>
         {% csrf_token %}
         <div class="form-grid">
-            <!-- Patient Name -->
+
+            <!-- Patient Select -->
             <div class="form-group">
-                <label for="patient_name">Patient Name <span style="color: var(--accent-rose);">*</span></label>
-                <input type="text" id="patient_name" name="patient_name" class="form-control" placeholder="e.g., John Doe" required>
-                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Enter the name of the patient scheduling the appointment.</p>
+                <label for="patient_id">Select Patient <span class="req">*</span></label>
+                <select id="patient_id" name="patient_id" class="form-control" required>
+                    <option value="">-- Choose Registered Patient --</option>
+                    {% for p in patients %}
+                    <option value="{{ p.id }}">{{ p.name }} (Age: {{ p.age }}, {{ p.gender }})</option>
+                    {% endfor %}
+                </select>
+                <span class="field-error" id="patient_id-error"></span>
             </div>
-            
+
+            <!-- Medical Record Number -->
+            <div class="form-group">
+                <label for="medical_record_number">Medical Record Number (MRN)</label>
+                <input type="text" id="medical_record_number" name="medical_record_number" class="form-control"
+                    placeholder="e.g., MRN-123456" maxlength="50">
+                <!-- <span class="field-hint">Optional appointment-specific MRN.</span> -->
+            </div>
+
+            <!-- Insurance Provider -->
+            <div class="form-group">
+                <label for="insurance_provider">Insurance Provider</label>
+                <input type="text" id="insurance_provider" name="insurance_provider" class="form-control"
+                    placeholder="e.g., Blue Cross Blue Shield" maxlength="100">
+            </div>
+
+            <!-- Doctor Select -->
+            <div class="form-group">
+                <label for="doctor_id">Attending Doctor</label>
+                <select id="doctor_id" name="doctor_id" class="form-control">
+                    <option value="">-- Select a Doctor --</option>
+                    {% for doc in doctors %}
+                    <option value="{{ doc.id }}">Dr. {{ doc.name }} ({{ doc.specialization }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
             <!-- Appointment Date & Time -->
             <div class="form-group">
-                <label for="appointment_date">Appointment Date & Time <span style="color: var(--accent-rose);">*</span></label>
+                <label for="appointment_date">Appointment Date & Time <span class="req">*</span></label>
                 <input type="datetime-local" id="appointment_date" name="appointment_date" class="form-control" required>
-                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Select the scheduled calendar date and clinical session hour.</p>
+                <!-- <span class="field-hint">Must be a future date and time.</span> -->
+                <span class="field-error" id="appointment_date-error"></span>
+            </div>
+
+            <!-- Priority Level -->
+            <div class="form-group">
+                <label for="priority_level">Priority Level</label>
+                <select id="priority_level" name="priority_level" class="form-control">
+                    <option value="Routine">🟢 Routine (Standard Checkup)</option>
+                    <option value="Urgent">🟡 Urgent (Needs attention soon)</option>
+                    <option value="Emergency">🔴 Emergency (Immediate attention)</option>
+                </select>
+            </div>
+
+            <!-- Reason for Visit -->
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label for="reason_for_visit">Reason for Visit / Symptoms <span class="req">*</span></label>
+                <textarea id="reason_for_visit" name="reason_for_visit" class="form-control" rows="3"
+                    placeholder="Briefly describe the reason for the appointment..." minlength="5" required></textarea>
+                <span class="field-error" id="reason_for_visit-error"></span>
+            </div>
+
+            <!-- Allergies / Conditions -->
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label for="allergies">Current Allergies / Medical Notes</label>
+                <textarea id="allergies" name="allergies" class="form-control" rows="2"
+                    placeholder="List any known allergies, current medications, or existing conditions..."></textarea>
             </div>
         </div>
-        
+
         <div class="form-actions">
             <a href="{% url 'appointment_list' %}" class="btn btn-secondary">Cancel</a>
             <button type="submit" class="btn btn-primary">
@@ -38,4 +96,84 @@
         </div>
     </form>
 </div>
+
+<style>
+.req { color: var(--accent-rose); }
+.field-error {
+    display: none;
+    font-size: 0.78rem;
+    color: #fb7185;
+    margin-top: 4px;
+}
+.field-error::before { content: "⚠ "; }
+.field-hint {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 3px;
+    display: block;
+}
+.form-control.is-valid {
+    border-color: rgba(13, 148, 136, 0.7) !important;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15) !important;
+}
+.form-control.is-invalid {
+    border-color: rgba(225, 29, 72, 0.7) !important;
+    box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.15) !important;
+}
+</style>
+
+<script>
+const apptRules = {
+    patient_id:       { message: "Please select a registered patient." },
+    appointment_date: { futureDate: true, message: "Appointment must be scheduled for a future date and time." },
+    reason_for_visit: { minLength: 5, message: "Please provide a reason for the visit (min. 5 characters)." },
+};
+
+function validateApptField(el, rules) {
+    const val = el.value.trim();
+    const errEl = document.getElementById(el.id + '-error');
+    let msg = '';
+
+    if (!val) {
+        msg = "This field is required.";
+    } else if (rules.minLength && val.length < rules.minLength) {
+        msg = rules.message;
+    } else if (rules.futureDate) {
+        const selected = new Date(val);
+        const now = new Date();
+        if (selected <= now) msg = rules.message;
+    }
+
+    if (msg) {
+        el.classList.add('is-invalid'); el.classList.remove('is-valid');
+        if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; }
+        return false;
+    } else {
+        el.classList.remove('is-invalid'); el.classList.add('is-valid');
+        if (errEl) errEl.style.display = 'none';
+        return true;
+    }
+}
+
+Object.keys(apptRules).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('blur', () => validateApptField(el, apptRules[id]));
+        el.addEventListener('change', () => validateApptField(el, apptRules[id]));
+        el.addEventListener('input', () => { if (el.classList.contains('is-invalid')) validateApptField(el, apptRules[id]); });
+    }
+});
+
+document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+    let valid = true;
+    Object.keys(apptRules).forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !validateApptField(el, apptRules[id])) valid = false;
+    });
+    if (!valid) {
+        e.preventDefault();
+        document.querySelector('.is-invalid')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+});
+</script>
 {% endblock %}

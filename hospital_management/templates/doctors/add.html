@@ -1,51 +1,228 @@
 {% extends 'base.html' %}
 
-{% block title %}Add Doctor | CarePulse{% endblock %}
+{% block title %}Register Doctor | CarePulse{% endblock %}
 {% block nav_doctors %}active{% endblock %}
 
 {% block page_title %}Register Doctor{% endblock %}
-{% block page_subtitle %}Add a new clinical practitioner to the system.{% endblock %}
+{% block page_subtitle %}Add a new clinical practitioner to the hospital system.{% endblock %}
 
 {% block content %}
-<div class="glass-card" style="max-width: 800px; margin: 0 auto;">
+<div class="glass-card" style="max-width: 860px; margin: 0 auto;">
     <div class="section-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 2rem;">
-        <h2>Medical Practitioner Credentials</h2>
+        <h2><i class="fa-solid fa-user-doctor" style="color: var(--accent-teal); margin-right: 0.5rem;"></i> Medical Practitioner Credentials</h2>
     </div>
-    
-    <form method="POST">
+
+    <form method="POST" id="doctorForm" novalidate>
         {% csrf_token %}
+
+        <!-- SECTION: Personal Information -->
+        <p class="form-section-label">Personal Information</p>
         <div class="form-grid">
-            <!-- Full Name -->
             <div class="form-group">
-                <label for="name">Doctor Name <span style="color: var(--accent-rose);">*</span></label>
-                <input type="text" id="name" name="name" class="form-control" placeholder="e.g., Sarah Smith" required>
+                <label for="name">Full Name <span class="req">*</span></label>
+                <input type="text" id="name" name="name" class="form-control" placeholder="e.g. James Carter"
+                    minlength="3" maxlength="100" required>
+                <span class="field-error" id="name-error"></span>
             </div>
-            
-            <!-- Specialization -->
             <div class="form-group">
-                <label for="specialization">Specialization <span style="color: var(--accent-rose);">*</span></label>
-                <input type="text" id="specialization" name="specialization" class="form-control" placeholder="e.g., Cardiology, Pediatrics" required>
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" class="form-control">
+                    <option value="">-- Select Gender --</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
             </div>
-            
-            <!-- Email Address -->
             <div class="form-group">
-                <label for="email">Email Address <span style="color: var(--accent-rose);">*</span></label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="e.g., dr.smith@carepulse.com" required>
+                <label for="date_of_birth">Date of Birth</label>
+                <input type="date" id="date_of_birth" name="date_of_birth" class="form-control">
+                <span class="field-error" id="date_of_birth-error"></span>
             </div>
-            
-            <!-- Phone Number -->
             <div class="form-group">
-                <label for="phone">Phone Contact <span style="color: var(--accent-rose);">*</span></label>
-                <input type="tel" id="phone" name="phone" class="form-control" placeholder="e.g., +1 234-567-8902" required>
+                <label for="nationality">Nationality</label>
+                <input type="text" id="nationality" name="nationality" class="form-control" placeholder="e.g. American, British"
+                    maxlength="50">
             </div>
         </div>
-        
+
+        <!-- SECTION: Professional Information -->
+        <p class="form-section-label" style="margin-top: 1.5rem;">Professional Information</p>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="specialization">Specialization <span class="req">*</span></label>
+                <input type="text" id="specialization" name="specialization" class="form-control"
+                    placeholder="e.g. Cardiology, Neurology" minlength="3" required>
+                <span class="field-error" id="specialization-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="department">Department</label>
+                <input type="text" id="department" name="department" class="form-control"
+                    placeholder="e.g. ICU, Outpatient, Surgery">
+            </div>
+            <div class="form-group">
+                <label for="qualification">Qualifications</label>
+                <input type="text" id="qualification" name="qualification" class="form-control"
+                    placeholder="e.g. MBBS, MD, FRCS">
+            </div>
+            <div class="form-group">
+                <label for="license_number">Medical License No.</label>
+                <input type="text" id="license_number" name="license_number" class="form-control"
+                    placeholder="e.g. MLC-2024-001">
+            </div>
+            <div class="form-group">
+                <label for="experience_years">Years of Experience</label>
+                <input type="number" id="experience_years" name="experience_years" class="form-control"
+                    min="0" max="60" placeholder="e.g. 12">
+                <span class="field-error" id="experience_years-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status" class="form-control">
+                    <option value="Active">Active</option>
+                    <option value="On Leave">On Leave</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- SECTION: Contact Information -->
+        <p class="form-section-label" style="margin-top: 1.5rem;">Contact Information</p>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="phone">Phone Number <span class="req">*</span></label>
+                <input type="tel" id="phone" name="phone" class="form-control" placeholder="+1-555-0100"
+                    pattern="^[\+]?[\d\s\-\(\)]{7,20}$" required>
+                <!-- <span class="field-hint">7–20 digits. Spaces, +, and dashes allowed.</span> -->
+                <span class="field-error" id="phone-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address <span class="req">*</span></label>
+                <input type="email" id="email" name="email" class="form-control"
+                    placeholder="doctor@hospital.com" required>
+                <span class="field-error" id="email-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="office_extension">Office Extension</label>
+                <input type="text" id="office_extension" name="office_extension" class="form-control"
+                    placeholder="e.g. Ext. 4201">
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label for="address">Office / Clinic Address</label>
+                <textarea id="address" name="address" class="form-control" rows="2"
+                    placeholder="Ward, Floor, Block or full clinic address..."></textarea>
+            </div>
+        </div>
+
+        <!-- SECTION: Biography -->
+        <p class="form-section-label" style="margin-top: 1.5rem;">Professional Bio</p>
+        <div class="form-grid">
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label for="bio">Short Biography</label>
+                <textarea id="bio" name="bio" class="form-control" rows="3"
+                    placeholder="Brief professional background and areas of expertise..."></textarea>
+            </div>
+        </div>
+
         <div class="form-actions">
             <a href="{% url 'doctor_list' %}" class="btn btn-secondary">Cancel</a>
             <button type="submit" class="btn btn-primary">
-                <i class="fa-solid fa-save"></i> Register Doctor
+                <i class="fa-solid fa-user-plus"></i> Register Doctor
             </button>
         </div>
     </form>
 </div>
+
+<style>
+.req { color: var(--accent-rose); }
+.form-section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent-teal);
+    margin-bottom: 1rem;
+}
+.field-error {
+    display: none;
+    font-size: 0.78rem;
+    color: #fb7185;
+    margin-top: 4px;
+}
+.field-error::before { content: "⚠ "; }
+.field-hint {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 3px;
+    display: block;
+}
+.form-control.is-valid {
+    border-color: rgba(13, 148, 136, 0.7) !important;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15) !important;
+}
+.form-control.is-invalid {
+    border-color: rgba(225, 29, 72, 0.7) !important;
+    box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.15) !important;
+}
+</style>
+
+<script>
+const doctorRules = {
+    name:             { minLength: 3, message: "Doctor name must be at least 3 characters." },
+    specialization:   { minLength: 3, message: "Specialization must be at least 3 characters." },
+    phone:            { pattern: /^[\+]?[\d\s\-\(\)]{7,20}$/, message: "Enter a valid phone number (7–20 digits)." },
+    email:            { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email address." },
+    experience_years: { min: 0, max: 60, optional: true, message: "Experience must be between 0 and 60 years." },
+    date_of_birth:    { dateMax: true, optional: true, message: "Date of birth cannot be in the future." },
+};
+
+function validateDoctorField(el, rules) {
+    const val = el.value.trim();
+    const errEl = document.getElementById(el.id + '-error');
+    let msg = '';
+
+    if (!val) {
+        if (!rules.optional) msg = "This field is required.";
+    } else if (rules.minLength && val.length < rules.minLength) {
+        msg = rules.message;
+    } else if (rules.pattern && !rules.pattern.test(val)) {
+        msg = rules.message;
+    } else if (rules.min !== undefined && (Number(val) < rules.min || Number(val) > rules.max)) {
+        msg = rules.message;
+    } else if (rules.dateMax) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        if (new Date(val) > today) msg = rules.message;
+    }
+
+    if (msg) {
+        el.classList.add('is-invalid'); el.classList.remove('is-valid');
+        if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; }
+        return false;
+    } else {
+        el.classList.remove('is-invalid');
+        if (val) el.classList.add('is-valid');
+        if (errEl) errEl.style.display = 'none';
+        return true;
+    }
+}
+
+Object.keys(doctorRules).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('blur', () => validateDoctorField(el, doctorRules[id]));
+        el.addEventListener('input', () => { if (el.classList.contains('is-invalid')) validateDoctorField(el, doctorRules[id]); });
+    }
+});
+
+document.getElementById('doctorForm').addEventListener('submit', function(e) {
+    let valid = true;
+    Object.keys(doctorRules).forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !validateDoctorField(el, doctorRules[id])) valid = false;
+    });
+    if (!valid) {
+        e.preventDefault();
+        document.querySelector('.is-invalid')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+});
+</script>
 {% endblock %}
